@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  db:
+    container_name: db
+    image: db_image
+    build: ./mariadb/
+    env_file:
+      - ./mariadb/.env
+    entrypoint: /bin/bash config.bash
+    ports:
+      - 3304:3306
