@@ -4,9 +4,13 @@ services:
   db:
     container_name: db
     image: db_image
-    build: ./mariadb/
+    build: ./requirements/mariadb/
     env_file:
-      - ./mariadb/.env
+      - ./requirements/mariadb/.env
     entrypoint: /bin/bash config.bash
     ports:
       - 3304:3306
+  webserver:
+    container_name: nginx
+    image: nginx_image
+    build: ./requirements/nginx/
