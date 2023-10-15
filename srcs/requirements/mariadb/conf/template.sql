@@ -1,7 +1,7 @@
-CREATE DATABASE wordpress;
+CREATE DATABASE IF NOT EXISTS %%DB_NAME%%;
 
+GRANT ALL PRIVILEGES ON %%DB_NAME%%.* TO '%%DB_USER%%'@'%' IDENTIFIED BY '%%DB_PASS%%' WITH GRANT OPTION;
 
--- Create the user and grant privileges
-CREATE USER 'robin'@'localhost' IDENTIFIED BY 'robin';
-GRANT ALL PRIVILEGES ON wordpress.* TO 'robin'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '%%DB_PASS%%' WITH GRANT OPTION;
+
 FLUSH PRIVILEGES;
