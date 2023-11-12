@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   db:
@@ -6,11 +6,53 @@ services:
     image: db_image
     build: ./requirements/mariadb/
     env_file:
-      - ./requirements/mariadb/.env
-    entrypoint: /bin/bash config.bash
+      - ./.env
     ports:
       - 3304:3306
+    volumes:
+      - db_volume1:/var/lib/mysql
+    restart: on-failure
+    networks:
+      - inception
   webserver:
     container_name: nginx
     image: nginx_image
     build: ./requirements/nginx/
+    env_file:
+      - ./.env
+    ports:
+      - 443:443
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+    volumes:
+      - wp-data:/var/www/html/
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "9000:9000"
+    volumes:
+      - wp-data:/var/www/html/
+    networks:
+      - inception
+    env_file:
+      - ./.env
+    restart: on-failure
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  wp-data:
+    driver_opts:
+      o: bind
+      type: none
+      device: /Users/ajaidi/Documents/inception/srcs/wp-data
+  db_volume1:
