@@ -8,7 +8,7 @@ handle_error() {
     exit ${exit_code}
 }
 
-if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [-z "$ROOT_PASS"]; then
+if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [ -z "$ROOT_PASS" ]; then
     handle_error 1 "check if required environment variables are set"
 fi
 
@@ -33,9 +33,6 @@ if [ $? -ne 0 ]; then
 fi
 
 mysql <seed.sql
-if [ $? -ne 0 ]; then
-    handle_error 1 "failed seeding into db"
-fi
 
 kill $(cat /var/run/mysqld/mysqld.pid)
 
@@ -44,7 +41,7 @@ if [ $? -ne 0 ]; then
     handle_error 1 "changing mariadb server acceess failed"
 fi
 
-service mariadb stop
+service mysql stop
 
 
 mysqld

@@ -1,20 +1,23 @@
 version: "3"
 
 services:
-  db:
-    container_name: db
+  mariadb:
+    container_name: mariadb
     image: db_image
     build: ./requirements/mariadb/
     env_file:
       - ./.env
-    ports:
-      - 3304:3306
     volumes:
-      - db_volume1:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     restart: on-failure
     networks:
       - inception
-  webserver:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  nginx:
     container_name: nginx
     image: nginx_image
     build: ./requirements/nginx/
@@ -25,34 +28,43 @@ services:
     networks:
       - inception
     depends_on:
-      - wordpress
+      wordpress:
+        condition: service_healthy
     volumes:
-      - wp-data:/var/www/html/
+      - wordpress:/var/www/html/
   wordpress:
     container_name: wordpress
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
     depends_on:
-      - db
-    ports:
-      - "9000:9000"
+      mariadb:
+        condition: service_healthy
     volumes:
-      - wp-data:/var/www/html/
+      - wordpress:/var/www/html/
     networks:
       - inception
     env_file:
       - ./.env
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "if pgrep php-fpm7.3 >/dev/null; then exit 0; else exit 1; fi"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 networks:
   inception:
     driver: bridge
 
 volumes:
-  wp-data:
+  wordpress:
     driver_opts:
       o: bind
       type: none
-      device: /Users/ajaidi/Documents/inception/srcs/wp-data
-  db_volume1:
+      device: /home/ajaidi/data/wordpress
+  mariadb:
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/ajaidi/data/mariadb

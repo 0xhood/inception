@@ -8,12 +8,6 @@ handle_error() {
     exit ${exit_code}
 }
 
-# if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [-z "$ROOT_PASS"]; then
-# handle_error 1 "check if required environment variables are set"
-# fi
-
-service nginx start
-
 openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048
 if [ $? -ne 0 ]; then
     handle_error 1 "failed generating pkey"
@@ -40,6 +34,5 @@ if [ $? -ne 0 ]; then
 fi
 
 chmod 777 /var/www/html
-service nginx stop
 
 nginx -g "daemon off;"

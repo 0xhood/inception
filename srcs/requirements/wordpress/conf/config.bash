@@ -8,10 +8,10 @@ handle_error() {
     exit ${exit_code}
 }
 
-if [ -z "$DB_NAME" ] || [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [-z "$ROOT_PASS"] || [-z "$DOMAIN_NAME"] || [-z "$WP_TITLE"] || [-z "$WP_ADMIN"] || [-z "$WP_ADMIN_PASS"] || [-z "$WP_ADMIN_EMAIL"] || [-z "$WP_USER"] || [-z "$WP_USER_EMAIL"] || [-z "$WP_PASS"]; then
+if [ -z "$DB_NAME" ] || [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [ -z "$ROOT_PASS" ] || [ -z "$DOMAIN_NAME" ] || [ -z "$WP_TITLE" ] || [ -z "$WP_ADMIN" ] || [ -z "$WP_ADMIN_PASS" ] || [ -z "$WP_ADMIN_EMAIL" ] || [ -z "$WP_USER" ] || [ -z "$WP_USER_EMAIL" ] || [ -z "$WP_PASS" ]; then
     handle_error 1 "check if required environment variables are set"
 fi
-
+if [ ! -f /var/www/html/index.php ]; then
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 if [ $? -ne 0 ]; then
     handle_error 1 "failed installing wp clif"
@@ -53,6 +53,6 @@ wp --allow-root core install --url=$DOMAIN_NAME/ --title=$WP_TITLE --admin_user=
 wp --allow-root user create $WP_USER $WP_USER_EMAIL --role=author --user_pass=$WP_PASS
 
 # sed -i "s/define( 'WP_DEBUG', false );/define( 'W P_DEBUG', true );/g" /var/www/html/wp-config.php
-
+fi
 
 exec php-fpm7.3 -F
